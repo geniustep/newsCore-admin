@@ -6,6 +6,10 @@
   "installCommand": "npm install",
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "https://admin.sahara2797.com/api/v1/:path*"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://admin.sahara2797.com/api/:path*"
     },
