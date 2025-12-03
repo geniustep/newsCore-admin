@@ -130,3 +130,32 @@ export const usersApi = {
   update: (id: string, data: any) => api.patch(`/users/${id}`, data),
   delete: (id: string) => api.delete(`/users/${id}`),
 };
+
+// Menus API
+export const menusApi = {
+  getAll: (params?: any) => api.get('/menus', { params }),
+  getOne: (id: string) => api.get(`/menus/${id}`),
+  getByLocation: (location: string, params?: any) =>
+    api.get(`/menus/location/${location}`, { params }),
+  getBySlug: (slug: string, params?: any) =>
+    api.get(`/menus/slug/${slug}`, { params }),
+  create: (data: any) => api.post('/menus', data),
+  update: (id: string, data: any) => api.patch(`/menus/${id}`, data),
+  delete: (id: string) => api.delete(`/menus/${id}`),
+  // Menu Items
+  createItem: (menuId: string, data: any) =>
+    api.post(`/menus/${menuId}/items`, data),
+  updateItem: (itemId: string, data: any) =>
+    api.patch(`/menus/items/${itemId}`, data),
+  deleteItem: (itemId: string) => api.delete(`/menus/items/${itemId}`),
+  reorderItems: (menuId: string, items: any[]) =>
+    api.post(`/menus/${menuId}/items/reorder`, items),
+  // Menu Locations
+  assignLocation: (menuId: string, location: string, priority?: number, conditions?: any) =>
+    api.post(`/menus/${menuId}/locations`, { location, priority, conditions }),
+  removeLocation: (menuId: string, location: string) =>
+    api.delete(`/menus/${menuId}/locations/${location}`),
+  // Dynamic Items
+  getDynamicItems: (type: string, limit?: number) =>
+    api.get(`/menus/dynamic/${type}`, { params: { limit } }),
+};

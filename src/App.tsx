@@ -10,6 +10,7 @@ import Tags from './pages/Tags';
 import Media from './pages/Media';
 import Users from './pages/Users';
 import Settings from './pages/Settings';
+import Menus from './pages/Menus';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -36,6 +37,7 @@ function App() {
         <Route path="tags" element={<Tags />} />
         <Route path="media" element={<Media />} />
         <Route path="users" element={<Users />} />
+        <Route path="menus" element={<Menus />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>

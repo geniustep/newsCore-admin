@@ -21,6 +21,7 @@ const navigation = [
   { name: 'التصنيفات', href: '/categories', icon: FolderIcon },
   { name: 'الوسوم', href: '/tags', icon: TagIcon },
   { name: 'الوسائط', href: '/media', icon: PhotoIcon },
+  { name: 'القوائم', href: '/menus', icon: Bars3Icon },
   { name: 'المستخدمين', href: '/users', icon: UsersIcon },
   { name: 'الإعدادات', href: '/settings', icon: Cog6ToothIcon },
 ];
