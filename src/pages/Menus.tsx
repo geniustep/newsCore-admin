@@ -15,7 +15,7 @@ import {
   TagIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
-import { menusApi, categoriesApi, tagsApi, articlesApi } from '../lib/api';
+import { menusApi, categoriesApi, tagsApi } from '../lib/api';
 
 interface MenuForm {
   name: string;
@@ -50,20 +50,6 @@ interface MenuItemForm {
   showOnDesktop: boolean;
   sortOrder: number;
 }
-
-const MENU_LOCATIONS = [
-  { value: 'header', label: 'الهيدر الرئيسي' },
-  { value: 'header-secondary', label: 'الهيدر الثانوي' },
-  { value: 'footer', label: 'الفوتر' },
-  { value: 'footer-1', label: 'الفوتر - العمود 1' },
-  { value: 'footer-2', label: 'الفوتر - العمود 2' },
-  { value: 'footer-3', label: 'الفوتر - العمود 3' },
-  { value: 'footer-4', label: 'الفوتر - العمود 4' },
-  { value: 'sidebar-left', label: 'الشريط الجانبي الأيسر' },
-  { value: 'sidebar-right', label: 'الشريط الجانبي الأيمن' },
-  { value: 'mobile', label: 'قائمة الموبايل' },
-  { value: 'topbar', label: 'الشريط العلوي' },
-];
 
 const MENU_ITEM_TYPES = [
   { value: 'CUSTOM', label: 'رابط مخصص', icon: LinkIcon },
@@ -166,10 +152,10 @@ export default function Menus() {
 
   const deleteMenuMutation = useMutation({
     mutationFn: (id: string) => menusApi.delete(id),
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
       toast.success('تم حذف القائمة بنجاح');
       queryClient.invalidateQueries({ queryKey: ['menus'] });
-      if (selectedMenuId === id) {
+      if (selectedMenuId === deletedId) {
         setSelectedMenuId(null);
       }
     },
@@ -215,17 +201,18 @@ export default function Menus() {
     },
   });
 
-  const reorderItemsMutation = useMutation({
-    mutationFn: ({ menuId, items }: { menuId: string; items: any[] }) =>
-      menusApi.reorderItems(menuId, items),
-    onSuccess: () => {
-      toast.success('تم إعادة الترتيب بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['menu', selectedMenuId] });
-    },
-    onError: (error: any) => {
-      toast.error(error.message);
-    },
-  });
+  // Reorder items mutation (kept for future drag & drop implementation)
+  // const reorderItemsMutation = useMutation({
+  //   mutationFn: ({ menuId, items }: { menuId: string; items: any[] }) =>
+  //     menusApi.reorderItems(menuId, items),
+  //   onSuccess: () => {
+  //     toast.success('تم إعادة الترتيب بنجاح');
+  //     queryClient.invalidateQueries({ queryKey: ['menu', selectedMenuId] });
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error.message);
+  //   },
+  // });
 
   const openMenuModal = (menu?: any) => {
     if (menu) {
