@@ -15,6 +15,7 @@ import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
   ListBulletIcon,
+  PaintBrushIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'الوسائط', href: '/media', icon: PhotoIcon },
   { name: 'القوائم', href: '/menus', icon: ListBulletIcon },
   { name: 'المستخدمين', href: '/users', icon: UsersIcon },
+  { name: 'إعدادات القالب', href: '/theme', icon: PaintBrushIcon },
   { name: 'الإعدادات', href: '/settings', icon: Cog6ToothIcon },
 ];
 
