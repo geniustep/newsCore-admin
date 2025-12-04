@@ -54,7 +54,6 @@ export default function Login() {
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="username"
                 {...register('email', {
@@ -81,7 +80,6 @@ export default function Login() {
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
                 {...register('password', {
