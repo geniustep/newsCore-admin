@@ -2,7 +2,12 @@ import axios from 'axios';
 import { useAuthStore } from '../store/auth';
 
 // Get API URL from environment variable or use relative path for proxy
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
+// In production on Vercel, use relative paths to avoid redirect loops
+// The vercel.json rewrite will handle proxying to the backend
+const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+const API_BASE_URL = isProduction 
+  ? '/api/v1'  // Use relative path in production - vercel.json will proxy it
+  : (import.meta.env.VITE_API_URL || '/api/v1');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

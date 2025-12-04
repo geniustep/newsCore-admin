@@ -129,16 +129,15 @@ npm run dev
 
 ```env
 # API URL - رابط Backend API
-VITE_API_URL=https://admin.sahara2797.com/api/v1
-```
-
-### للتطوير المحلي
-
-إذا كان Backend يعمل محلياً، اترك `VITE_API_URL` فارغاً لاستخدام Proxy:
-
-```env
+# في الإنتاج على Vercel: اتركه فارغاً إذا كان Backend على نفس النطاق
+# في التطوير المحلي: اتركه فارغاً لاستخدام Proxy من vite.config.ts
 VITE_API_URL=
 ```
+
+**ملاحظة مهمة:**
+- في **الإنتاج على Vercel**: إذا كان الـ Backend على نفس النطاق (`admin.sahara2797.com`)، اترك `VITE_API_URL` فارغاً. الكود سيستخدم مسارات نسبية (`/api/v1`) تلقائياً.
+- في **التطوير المحلي**: اترك `VITE_API_URL` فارغاً لاستخدام Proxy المحدد في `vite.config.ts`.
+- إذا كان الـ Backend على نطاق مختلف، أضف الرابط الكامل هنا.
 
 ---
 
@@ -157,28 +156,235 @@ npm run preview
 
 ---
 
-## 🚢 النشر على Vercel
+## 🚢 النشر على Vercel و Cloudflare
 
-### 1. ربط المستودع
+### 📦 النشر على Vercel
+
+#### 1. ربط المستودع
 
 1. اذهب إلى [Vercel Dashboard](https://vercel.com/dashboard)
 2. اضغط "Add New Project"
-3. اختر مستودع `geniustep/newsCore-admin`
+3. اختر مستودع `geniustep/newsCore-admin` أو ربط مستودع GitHub الخاص بك
 
-### 2. إعداد المتغيرات
+#### 2. إعداد المتغيرات
 
-في إعدادات المشروع على Vercel، أضف:
+**⚠️ مهم:** لا تحتاج إلى إضافة `VITE_API_URL` في Vercel إذا كان الـ Backend على نفس النطاق.
+
+الكود يستخدم تلقائياً مسارات نسبية (`/api/v1`) في الإنتاج لتجنب حلقة إعادة التوجيه (508 Loop Detected).
+
+**إذا كان الـ Backend على نطاق مختلف:**
+1. اذهب إلى **Settings** → **Environment Variables**
+2. أضف المتغير `VITE_API_URL` مع رابط الـ Backend الكامل
+3. اختر البيئات (Production, Preview, Development)
+4. احفظ التغييرات
+
+**ملاحظة:** إذا كان الـ Frontend والـ Backend على نفس النطاق (مثل `admin.sahara2797.com`)، اترك `VITE_API_URL` فارغاً أو لا تضيفه - الكود سيستخدم المسارات النسبية تلقائياً.
+
+#### 3. إعدادات البناء
+
+Vercel سيكتشف تلقائياً:
+- **Framework Preset**: Vite
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Install Command**: `npm install`
+
+#### 4. النشر
+
+بعد ربط المستودع:
+- Vercel سيقوم تلقائياً بنشر كل commit جديد على branch `main`
+- ستحصل على رابط مثل: `https://your-project.vercel.app`
+
+---
+
+### ☁️ ربط Cloudflare مع Vercel
+
+#### الطريقة 1: استخدام Cloudflare كـ DNS فقط (مُوصى به)
+
+هذه الطريقة تحافظ على Vercel كـ Hosting وتحسن الأداء عبر Cloudflare CDN:
+
+##### الخطوة 1: إعداد النطاق في Vercel
+
+1. اذهب إلى **Settings** → **Domains** في مشروع Vercel
+2. أضف النطاق المخصص (مثل: `admin.yourdomain.com`)
+3. Vercel سيعطيك سجلات DNS المطلوبة
+
+##### الخطوة 2: إعداد Cloudflare DNS
+
+1. اذهب إلى [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. اختر النطاق الخاص بك
+3. اذهب إلى **DNS** → **Records**
+4. أضف السجلات التالية:
+
+| النوع | الاسم | المحتوى | TTL | Proxy |
+|------|------|---------|-----|-------|
+| `CNAME` | `admin` | `cname.vercel-dns.com` | Auto | 🟠 Proxied |
+| `CNAME` | `www.admin` | `cname.vercel-dns.com` | Auto | 🟠 Proxied |
+
+**ملاحظة:** استخدم القيمة الصحيحة من Vercel (قد تكون مختلفة)
+
+##### الخطوة 3: تفعيل Cloudflare Features
+
+في Cloudflare Dashboard:
+
+1. **SSL/TLS** → **Overview**
+   - اختر **Full (strict)** mode
+   - هذا يضمن تشفير كامل بين Cloudflare و Vercel
+
+2. **Speed** → **Optimization**
+   - فعّل **Auto Minify** (HTML, CSS, JS)
+   - فعّل **Brotli** compression
+
+3. **Caching** → **Configuration**
+   - **Caching Level**: Standard
+   - **Browser Cache TTL**: 4 hours
+   - **Edge Cache TTL**: 1 month (للملفات الثابتة)
+
+4. **Network**
+   - فعّل **HTTP/2**
+   - فعّل **HTTP/3 (with QUIC)**
+   - فعّل **0-RTT Connection Resumption**
+
+##### الخطوة 4: إعداد Page Rules (اختياري)
+
+لتحسين الأداء أكثر:
+
+1. اذهب إلى **Rules** → **Page Rules**
+2. أنشئ قاعدة جديدة:
+   - **URL Pattern**: `admin.yourdomain.com/assets/*`
+   - **Settings**:
+     - Cache Level: Cache Everything
+     - Edge Cache TTL: 1 month
+     - Browser Cache TTL: 1 month
+
+---
+
+#### الطريقة 2: استخدام Cloudflare Pages (بديل)
+
+إذا كنت تريد استخدام Cloudflare Pages بدلاً من Vercel:
+
+##### الخطوة 1: ربط المستودع
+
+1. اذهب إلى [Cloudflare Pages](https://pages.cloudflare.com)
+2. اضغط **Create a project**
+3. اختر **Connect to Git**
+4. اختر مستودع GitHub الخاص بك
+
+##### الخطوة 2: إعدادات البناء
+
+| الإعداد | القيمة |
+|---------|--------|
+| **Framework preset** | Vite |
+| **Build command** | `npm run build` |
+| **Build output directory** | `dist` |
+| **Root directory** | `/` (أو المسار الصحيح) |
+
+##### الخطوة 3: متغيرات البيئة
+
+أضف في **Environment variables**:
 
 | المتغير | القيمة |
 |---------|--------|
 | `VITE_API_URL` | `https://admin.sahara2797.com/api/v1` |
+| `NODE_VERSION` | `20` |
 
-### 3. النشر
+##### الخطوة 4: إعدادات Cloudflare
 
-Vercel سيقوم تلقائياً بـ:
-- تثبيت التبعيات
-- بناء المشروع
-- نشره على نطاق فرعي
+1. **Custom domains**: أضف النطاق المخصص
+2. **Functions**: (اختياري) لإضافة Serverless Functions
+3. **Analytics**: فعّل لمراقبة الأداء
+
+---
+
+### 🔧 إعدادات إضافية
+
+#### إعدادات Vercel (vercel.json)
+
+المشروع يحتوي بالفعل على ملف `vercel.json` مع الإعدادات التالية:
+
+- ✅ Rewrites للـ API routes
+- ✅ Headers للأمان
+- ✅ Cache headers للملفات الثابتة
+
+#### إعدادات Cloudflare Workers (اختياري)
+
+يمكنك إنشاء Worker لتحسين الأداء:
+
+```javascript
+// cloudflare-worker.js
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  // إضافة headers للأمان
+  const response = await fetch(request)
+  const newResponse = new Response(response.body, response)
+  
+  newResponse.headers.set('X-Content-Type-Options', 'nosniff')
+  newResponse.headers.set('X-Frame-Options', 'DENY')
+  newResponse.headers.set('X-XSS-Protection', '1; mode=block')
+  
+  return newResponse
+}
+```
+
+---
+
+### ✅ التحقق من الإعداد
+
+بعد إكمال الخطوات:
+
+1. **تحقق من SSL**: تأكد أن الموقع يعمل على `https://`
+2. **تحقق من الأداء**: استخدم [PageSpeed Insights](https://pagespeed.web.dev/)
+3. **تحقق من CDN**: تأكد أن الملفات الثابتة يتم تحميلها من Cloudflare
+
+---
+
+### 🐛 حل المشاكل الشائعة
+
+#### مشكلة: الموقع لا يعمل بعد ربط Cloudflare
+
+**الحل:**
+- تأكد من أن SSL mode في Cloudflare هو **Full (strict)**
+- تحقق من أن السجلات DNS صحيحة
+- انتظر 5-10 دقائق لتحديث DNS
+
+#### مشكلة: API calls لا تعمل أو خطأ 508 (Loop Detected)
+
+**الحل:**
+- **لا تضيف** `VITE_API_URL` في Vercel إذا كان الـ Backend على نفس النطاق
+- الكود يستخدم تلقائياً مسارات نسبية في الإنتاج لتجنب حلقة إعادة التوجيه
+- تحقق من إعدادات CORS في Backend
+- تأكد من أن `vercel.json` لا يحتوي على rewrite rules تسبب حلقة (تم إزالتها في الإصدار الحالي)
+- إذا كان الـ Backend على نطاق مختلف، أضف `VITE_API_URL` مع الرابط الكامل
+
+#### مشكلة: الملفات الثابتة لا يتم cache
+
+**الحل:**
+- تحقق من إعدادات Cache في Cloudflare
+- تأكد من headers في `vercel.json`
+- راجع Page Rules في Cloudflare
+
+---
+
+### 📊 مراقبة الأداء
+
+#### Cloudflare Analytics
+
+1. اذهب إلى **Analytics** → **Web Analytics**
+2. فعّل Web Analytics للموقع
+3. راقب:
+   - عدد الزوار
+   - سرعة التحميل
+   - معدل الأخطاء
+
+#### Vercel Analytics
+
+1. اذهب إلى **Analytics** في Vercel Dashboard
+2. فعّل Vercel Analytics
+3. راقب:
+   - Core Web Vitals
+   - Real User Monitoring
 
 ---
 
