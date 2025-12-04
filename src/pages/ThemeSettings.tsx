@@ -124,9 +124,12 @@ export default function ThemeSettings() {
   const queryClient = useQueryClient();
 
   // Fetch theme settings from backend
-  const { data: backendTheme, isLoading } = useQuery({
+  const { data: backendTheme } = useQuery({
     queryKey: ['themeSettings'],
-    queryFn: () => settingsApi.getTheme(),
+    queryFn: async () => {
+      const response = await settingsApi.getTheme();
+      return response as ThemeSettings;
+    },
   });
 
   // Mutation to save theme settings to backend
@@ -148,8 +151,8 @@ export default function ThemeSettings() {
   // Update form when backend theme is loaded
   useEffect(() => {
     if (backendTheme) {
-      reset(backendTheme);
-      updateTheme(backendTheme);
+      reset(backendTheme as ThemeSettings);
+      updateTheme(backendTheme as ThemeSettings);
     }
   }, [backendTheme, reset, updateTheme]);
 
