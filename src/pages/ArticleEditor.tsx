@@ -10,9 +10,12 @@ import {
   EyeIcon,
   CheckCircleIcon,
   ClockIcon,
+  Bars3Icon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import TipTapEditor from '../components/TipTapEditor';
 import ArticlePreviewModal from '../components/ArticlePreviewModal';
+import DocumentOutline from '../components/DocumentOutline';
 
 interface ArticleForm {
   title: string;
@@ -38,6 +41,8 @@ export default function ArticleEditor() {
   const isEditing = Boolean(id);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle');
+  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [createdArticleId, setCreatedArticleId] = useState<string | null>(null);
   const autoSaveTimerRef = useRef<number>();
 
   const {
@@ -106,10 +111,15 @@ export default function ArticleEditor() {
 
   const createMutation = useMutation({
     mutationFn: (data: any) => articlesApi.create(data),
-    onSuccess: () => {
-      toast.success('تم إنشاء المقال بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['articles'] });
-      navigate('/articles');
+    onSuccess: (response: any) => {
+      const articleId = response?.data?.id;
+      if (articleId) {
+        setCreatedArticleId(articleId);
+        toast.success('تم إنشاء المقال بنجاح');
+        queryClient.invalidateQueries({ queryKey: ['articles'] });
+        // Navigate to edit mode with the new article ID
+        navigate(`/articles/${articleId}/edit`, { replace: true });
+      }
     },
     onError: (error: any) => {
       toast.error(error.message);
@@ -128,7 +138,25 @@ export default function ArticleEditor() {
     },
   });
 
-  const autoSaveMutation = useMutation({
+  const autoSaveCreateMutation = useMutation({
+    mutationFn: (data: any) => articlesApi.create(data),
+    onSuccess: (response: any) => {
+      const articleId = response?.data?.id;
+      if (articleId) {
+        setCreatedArticleId(articleId);
+        setAutoSaveStatus('saved');
+        queryClient.invalidateQueries({ queryKey: ['articles'] });
+        // Navigate to edit mode silently
+        navigate(`/articles/${articleId}/edit`, { replace: true });
+        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+      }
+    },
+    onError: () => {
+      setAutoSaveStatus('idle');
+    },
+  });
+
+  const autoSaveUpdateMutation = useMutation({
     mutationFn: (data: any) => articlesApi.update(id!, data),
     onSuccess: () => {
       setAutoSaveStatus('saved');
@@ -141,20 +169,25 @@ export default function ArticleEditor() {
   });
 
   const performAutoSave = useCallback((data: Partial<ArticleForm>) => {
-    if (!isEditing) return;
+    // Skip auto-save if title and content are both empty
+    if (!data.title && !data.content) return;
 
     setAutoSaveStatus('saving');
     const payload = {
       ...data,
       contentHtml: data.content,
+      status: 'DRAFT', // Always save as draft for auto-save
     };
-    autoSaveMutation.mutate(payload);
-  }, [isEditing, autoSaveMutation]);
+
+    if (isEditing || createdArticleId) {
+      autoSaveUpdateMutation.mutate(payload);
+    } else {
+      autoSaveCreateMutation.mutate(payload);
+    }
+  }, [isEditing, createdArticleId, autoSaveUpdateMutation, autoSaveCreateMutation]);
 
   // Auto-save on content change
   useEffect(() => {
-    if (!isEditing) return;
-
     const subscription = watch((value) => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
@@ -171,7 +204,7 @@ export default function ArticleEditor() {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [watch, performAutoSave, isEditing]);
+  }, [watch, performAutoSave]);
 
   const onSubmit = (data: ArticleForm) => {
     const payload = {
@@ -215,46 +248,70 @@ export default function ArticleEditor() {
           </div>
         </div>
 
-        {/* Auto-save indicator & Preview button */}
-        <div className="flex items-center gap-4">
-          {isEditing && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border">
-              {autoSaveStatus === 'saving' && (
-                <>
-                  <ClockIcon className="w-5 h-5 text-yellow-500 animate-pulse" />
-                  <span className="text-sm text-gray-600">جاري الحفظ...</span>
-                </>
-              )}
-              {autoSaveStatus === 'saved' && (
-                <>
-                  <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                  <span className="text-sm text-gray-600">تم الحفظ</span>
-                </>
-              )}
-              {autoSaveStatus === 'idle' && (
-                <>
-                  <CheckCircleIcon className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm text-gray-500">محفوظ</span>
-                </>
-              )}
-            </div>
+        {/* Auto-save indicator & Actions */}
+        <div className="flex items-center gap-2">
+          {/* Auto-save status */}
+          <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border">
+            {autoSaveStatus === 'saving' && (
+              <>
+                <ClockIcon className="w-5 h-5 text-yellow-500 animate-pulse" />
+                <span className="text-sm text-gray-600">جاري الحفظ...</span>
+              </>
+            )}
+            {autoSaveStatus === 'saved' && (
+              <>
+                <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                <span className="text-sm text-gray-600">تم الحفظ</span>
+              </>
+            )}
+            {autoSaveStatus === 'idle' && (
+              <>
+                <CheckCircleIcon className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-500">محفوظ</span>
+              </>
+            )}
+          </div>
+
+          {/* Article Link - Only show if article is published */}
+          {isEditing && (article as any)?.data?.slug && (article as any)?.data?.status === 'PUBLISHED' && (
+            <a
+              href={`/articles/${(article as any)?.data?.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              title="عرض المقالة"
+            >
+              <GlobeAltIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">عرض المقالة</span>
+            </a>
           )}
 
+          {/* Preview button */}
           <button
             type="button"
             onClick={() => setIsPreviewOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <EyeIcon className="w-5 h-5" />
-            معاينة
+            <span className="hidden sm:inline">معاينة</span>
+          </button>
+
+          {/* Toggle sidebar button */}
+          <button
+            type="button"
+            onClick={() => setSidebarVisible(!sidebarVisible)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            title={sidebarVisible ? 'إخفاء الشريط الجانبي' : 'إظهار الشريط الجانبي'}
+          >
+            <Bars3Icon className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 gap-6 ${sidebarVisible ? 'lg:grid-cols-3' : ''}`}>
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className={`space-y-6 ${sidebarVisible ? 'lg:col-span-2' : ''}`}>
             <div className="bg-white rounded-xl shadow-sm border p-6 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -351,9 +408,13 @@ export default function ArticleEditor() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Publish */}
-            <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+          {sidebarVisible && (
+            <div className="space-y-6">
+              {/* Document Outline */}
+              <DocumentOutline content={formData.content || ''} />
+
+              {/* Publish */}
+              <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
               <h3 className="font-semibold text-gray-900">النشر</h3>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -503,7 +564,8 @@ export default function ArticleEditor() {
                 )}
               />
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </form>
 

@@ -1,6 +1,6 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ComputerDesktopIcon, DeviceTabletIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/outline';
 
 interface ArticlePreviewModalProps {
   isOpen: boolean;
@@ -15,11 +15,21 @@ interface ArticlePreviewModalProps {
   };
 }
 
+type DeviceType = 'desktop' | 'tablet' | 'mobile';
+
+const deviceWidths = {
+  desktop: 'max-w-4xl',
+  tablet: 'max-w-2xl',
+  mobile: 'max-w-sm',
+};
+
 export default function ArticlePreviewModal({
   isOpen,
   onClose,
   article,
 }: ArticlePreviewModalProps) {
+  const [device, setDevice] = useState<DeviceType>('desktop');
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -46,12 +56,46 @@ export default function ArticlePreviewModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+              <Dialog.Panel className={`w-full ${deviceWidths[device]} transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all`}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b">
-                  <Dialog.Title className="text-xl font-bold text-gray-900">
-                    معاينة المقال
-                  </Dialog.Title>
+                  <div className="flex items-center gap-4">
+                    <Dialog.Title className="text-xl font-bold text-gray-900">
+                      معاينة المقال
+                    </Dialog.Title>
+
+                    {/* Device Toggle */}
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                      <button
+                        onClick={() => setDevice('desktop')}
+                        className={`p-2 rounded transition-colors ${
+                          device === 'desktop' ? 'bg-white shadow' : 'hover:bg-gray-200'
+                        }`}
+                        title="سطح المكتب"
+                      >
+                        <ComputerDesktopIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setDevice('tablet')}
+                        className={`p-2 rounded transition-colors ${
+                          device === 'tablet' ? 'bg-white shadow' : 'hover:bg-gray-200'
+                        }`}
+                        title="تابلت"
+                      >
+                        <DeviceTabletIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setDevice('mobile')}
+                        className={`p-2 rounded transition-colors ${
+                          device === 'mobile' ? 'bg-white shadow' : 'hover:bg-gray-200'
+                        }`}
+                        title="هاتف"
+                      >
+                        <DevicePhoneMobileIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
                   <button
                     onClick={onClose}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -73,12 +117,16 @@ export default function ArticlePreviewModal({
 
                   {/* Article Header */}
                   <article className="prose prose-lg max-w-none" dir="rtl">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                    <h1 className={`font-bold text-gray-900 mb-2 ${
+                      device === 'mobile' ? 'text-2xl' : 'text-4xl'
+                    }`}>
                       {article.title}
                     </h1>
 
                     {article.subtitle && (
-                      <h2 className="text-xl text-gray-600 font-normal mb-4">
+                      <h2 className={`text-gray-600 font-normal mb-4 ${
+                        device === 'mobile' ? 'text-lg' : 'text-xl'
+                      }`}>
                         {article.subtitle}
                       </h2>
                     )}
