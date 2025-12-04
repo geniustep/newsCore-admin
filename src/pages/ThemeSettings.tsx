@@ -149,18 +149,14 @@ export default function ThemeSettings() {
     defaultValues: theme,
   });
 
-  // Update form when backend theme is loaded
+  // Update form when backend theme is loaded (only once)
   useEffect(() => {
     if (backendTheme) {
       reset(backendTheme as ThemeSettings);
       updateTheme(backendTheme as ThemeSettings);
     }
-  }, [backendTheme, reset, updateTheme]);
-
-  // Update form when theme changes
-  useEffect(() => {
-    reset(theme);
-  }, [theme, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [backendTheme]); // Only reset when backendTheme changes to prevent form reset loops
 
   const formData = watch();
 
@@ -312,6 +308,7 @@ export default function ThemeSettings() {
                         <input
                           {...register('logoAr')}
                           type="url"
+                          disabled={false}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                           placeholder="https://example.com/logo-ar.png"
                         />
@@ -334,6 +331,7 @@ export default function ThemeSettings() {
                         <input
                           {...register('logoEn')}
                           type="url"
+                          disabled={false}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                           placeholder="https://example.com/logo-en.png"
                         />
@@ -356,6 +354,7 @@ export default function ThemeSettings() {
                         <input
                           {...register('logoFr')}
                           type="url"
+                          disabled={false}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                           placeholder="https://example.com/logo-fr.png"
                         />
@@ -378,6 +377,7 @@ export default function ThemeSettings() {
                         <input
                           {...register('favicon')}
                           type="url"
+                          disabled={false}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                           placeholder="https://example.com/favicon.ico"
                         />
