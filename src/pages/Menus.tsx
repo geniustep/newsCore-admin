@@ -14,6 +14,7 @@ import {
   FolderIcon,
   TagIcon,
   DocumentTextIcon,
+  MapPinIcon,
 } from '@heroicons/react/24/outline';
 import { menusApi, categoriesApi, tagsApi } from '../lib/api';
 
@@ -61,6 +62,20 @@ const MENU_ITEM_TYPES = [
   { value: 'DYNAMIC', label: 'ديناميكي', icon: Bars3Icon },
 ];
 
+const MENU_LOCATIONS = [
+  { value: 'header', label: 'الهيدر الرئيسي', description: 'القائمة الرئيسية في أعلى الصفحة' },
+  { value: 'header-secondary', label: 'الهيدر الثانوي', description: 'قائمة ثانوية في الهيدر' },
+  { value: 'footer', label: 'الفوتر', description: 'قائمة الفوتر الرئيسية' },
+  { value: 'footer-1', label: 'الفوتر - العمود 1', description: 'العمود الأول في الفوتر' },
+  { value: 'footer-2', label: 'الفوتر - العمود 2', description: 'العمود الثاني في الفوتر' },
+  { value: 'footer-3', label: 'الفوتر - العمود 3', description: 'العمود الثالث في الفوتر' },
+  { value: 'footer-4', label: 'الفوتر - العمود 4', description: 'العمود الرابع في الفوتر' },
+  { value: 'sidebar-left', label: 'الشريط الجانبي الأيسر', description: 'القائمة في الشريط الجانبي الأيسر' },
+  { value: 'sidebar-right', label: 'الشريط الجانبي الأيمن', description: 'القائمة في الشريط الجانبي الأيمن' },
+  { value: 'mobile', label: 'قائمة الموبايل', description: 'قائمة خاصة بالهواتف المحمولة' },
+  { value: 'topbar', label: 'الشريط العلوي', description: 'الشريط العلوي أعلى الهيدر' },
+];
+
 export default function Menus() {
   const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null);
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
@@ -68,6 +83,7 @@ export default function Menus() {
   const [editingMenuId, setEditingMenuId] = useState<string | null>(null);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const menuForm = useForm<MenuForm>({
@@ -201,18 +217,32 @@ export default function Menus() {
     },
   });
 
-  // Reorder items mutation (kept for future drag & drop implementation)
-  // const reorderItemsMutation = useMutation({
-  //   mutationFn: ({ menuId, items }: { menuId: string; items: any[] }) =>
-  //     menusApi.reorderItems(menuId, items),
-  //   onSuccess: () => {
-  //     toast.success('تم إعادة الترتيب بنجاح');
-  //     queryClient.invalidateQueries({ queryKey: ['menu', selectedMenuId] });
-  //   },
-  //   onError: (error: any) => {
-  //     toast.error(error.message);
-  //   },
-  // });
+  const assignLocationMutation = useMutation({
+    mutationFn: ({ menuId, location, priority }: { menuId: string; location: string; priority?: number }) =>
+      menusApi.assignLocation(menuId, location, priority),
+    onSuccess: () => {
+      toast.success('تم تعيين الموقع بنجاح');
+      queryClient.invalidateQueries({ queryKey: ['menu', selectedMenuId] });
+      queryClient.invalidateQueries({ queryKey: ['menus'] });
+      setIsLocationModalOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  const removeLocationMutation = useMutation({
+    mutationFn: ({ menuId, location }: { menuId: string; location: string }) =>
+      menusApi.removeLocation(menuId, location),
+    onSuccess: () => {
+      toast.success('تم إزالة الموقع بنجاح');
+      queryClient.invalidateQueries({ queryKey: ['menu', selectedMenuId] });
+      queryClient.invalidateQueries({ queryKey: ['menus'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
 
   const openMenuModal = (menu?: any) => {
     if (menu) {
@@ -501,22 +531,77 @@ export default function Menus() {
           </div>
         </div>
 
-        {/* Menu Items */}
-        <div className="lg:col-span-2">
+        {/* Menu Items & Locations */}
+        <div className="lg:col-span-2 space-y-4">
           {selectedMenuId ? (
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-lg">
-                  عناصر القائمة: {menu?.name}
-                </h2>
-                <button
-                  onClick={() => openItemModal(undefined, undefined)}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
-                >
-                  <PlusIcon className="w-4 h-4" />
-                  إضافة عنصر
-                </button>
+            <>
+              {/* Menu Locations */}
+              <div className="bg-white rounded-xl shadow-sm border p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold text-lg">مواقع القائمة</h3>
+                    <p className="text-sm text-gray-500">حدد أين تظهر هذه القائمة في الموقع</p>
+                  </div>
+                  <button
+                    onClick={() => setIsLocationModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
+                  >
+                    <MapPinIcon className="w-4 h-4" />
+                    تعيين موقع
+                  </button>
+                </div>
+                {menu?.locations && menu.locations.length > 0 ? (
+                  <div className="space-y-2">
+                    {menu.locations.map((loc: any) => (
+                      <div
+                        key={loc.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div>
+                          <div className="font-medium">
+                            {MENU_LOCATIONS.find((l) => l.value === loc.location)?.label || loc.location}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            الأولوية: {loc.priority}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (confirm(`هل تريد إزالة القائمة من "${MENU_LOCATIONS.find((l) => l.value === loc.location)?.label || loc.location}"؟`)) {
+                              removeLocationMutation.mutate({
+                                menuId: selectedMenuId!,
+                                location: loc.location,
+                              });
+                            }
+                          }}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500 text-sm">
+                    لم يتم تعيين أي موقع لهذه القائمة. انقر على "تعيين موقع" لإضافة موقع.
+                  </div>
+                )}
               </div>
+
+              {/* Menu Items */}
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-semibold text-lg">
+                    عناصر القائمة: {menu?.name}
+                  </h2>
+                  <button
+                    onClick={() => openItemModal(undefined, undefined)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                    إضافة عنصر
+                  </button>
+                </div>
               {menuLoading ? (
                 <div className="text-center py-8">جاري التحميل...</div>
               ) : !menu?.items || menu.items.length === 0 ? (
@@ -528,7 +613,8 @@ export default function Menus() {
                   {menu.items.map((item: any) => renderMenuItem(item))}
                 </div>
               )}
-            </div>
+              </div>
+            </>
           ) : (
             <div className="bg-white rounded-xl shadow-sm border p-12 text-center text-gray-500">
               اختر قائمة لعرض عناصرها
@@ -820,6 +906,67 @@ export default function Menus() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Location Assignment Modal */}
+      {isLocationModalOpen && selectedMenuId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white">
+              <h2 className="text-lg font-semibold">تعيين موقع للقائمة</h2>
+              <button
+                onClick={() => setIsLocationModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-sm text-gray-600 mb-4">
+                اختر موقعاً لعرض القائمة "{menu?.name}" فيه
+              </p>
+              {MENU_LOCATIONS.map((location) => {
+                const isAssigned = menu?.locations?.some(
+                  (loc: any) => loc.location === location.value && loc.isActive
+                );
+                return (
+                  <div
+                    key={location.value}
+                    className={`p-4 border rounded-lg ${
+                      isAssigned ? 'bg-primary-50 border-primary-200' : 'bg-white border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">{location.label}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          {location.description}
+                        </div>
+                      </div>
+                      {isAssigned ? (
+                        <span className="text-sm text-primary-600 font-medium">مُعين</span>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            assignLocationMutation.mutate({
+                              menuId: selectedMenuId,
+                              location: location.value,
+                              priority: 0,
+                            });
+                          }}
+                          className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm"
+                          disabled={assignLocationMutation.isPending}
+                        >
+                          تعيين
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

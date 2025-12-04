@@ -44,7 +44,7 @@ export default function Login() {
             <p className="text-gray-500">لوحة إدارة المحتوى الإخباري</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" autoComplete="on">
             <div>
               <label
                 htmlFor="email"
@@ -54,7 +54,9 @@ export default function Login() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
+                autoComplete="username"
                 {...register('email', {
                   required: 'البريد الإلكتروني مطلوب',
                   pattern: {
@@ -79,7 +81,9 @@ export default function Login() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 {...register('password', {
                   required: 'كلمة المرور مطلوبة',
                   minLength: {
