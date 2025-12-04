@@ -29,7 +29,7 @@ api.interceptors.request.use((config) => {
 
 // Response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response.data?.data ?? response.data,
   async (error) => {
     if (error.response?.status === 401) {
       // Try to refresh token
