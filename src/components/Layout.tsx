@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -16,6 +17,8 @@ import {
   UserCircleIcon,
   ListBulletIcon,
   PaintBrushIcon,
+  MoonIcon,
+  SunIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -34,6 +37,7 @@ const navigation = [
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuthStore();
+  const { currentLogo, isDarkMode, toggleDarkMode } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -53,17 +57,23 @@ export default function Layout() {
 
       {/* Mobile sidebar */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-72 shadow-xl transform transition-transform duration-300 lg:hidden ${
           sidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ backgroundColor: 'var(--color-background)' }}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b">
-          <span className="text-xl font-bold text-primary-600">NewsCore</span>
+        <div className="flex items-center justify-between h-16 px-4 border-b" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+          {currentLogo ? (
+            <img src={currentLogo} alt="Logo" className="h-8 object-contain" />
+          ) : (
+            <span className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>NewsCore</span>
+          )}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-100"
+            className="p-2 rounded-lg hover:opacity-80"
+            style={{ backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }}
           >
-            <XMarkIcon className="w-6 h-6" />
+            <XMarkIcon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />
           </button>
         </div>
         <nav className="p-4 space-y-1">
@@ -72,13 +82,11 @@ export default function Layout() {
               key={item.name}
               to={item.href}
               onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-600'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`
-              }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                color: isActive ? '#ffffff' : 'var(--color-text)',
+              })}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:opacity-80"
             >
               <item.icon className="w-5 h-5" />
               {item.name}
@@ -89,9 +97,25 @@ export default function Layout() {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-1 bg-white border-l">
-          <div className="flex items-center h-16 px-6 border-b">
-            <span className="text-xl font-bold text-primary-600">NewsCore</span>
+        <div className="flex flex-col flex-1 border-l" style={{ backgroundColor: 'var(--color-background)', borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+          <div className="flex items-center justify-between h-16 px-6 border-b" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+            {currentLogo ? (
+              <img src={currentLogo} alt="Logo" className="h-8 object-contain" />
+            ) : (
+              <span className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>NewsCore</span>
+            )}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-lg hover:opacity-80"
+              style={{ backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }}
+              title={isDarkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
+            >
+              {isDarkMode ? (
+                <SunIcon className="w-5 h-5" style={{ color: 'var(--color-text)' }} />
+              ) : (
+                <MoonIcon className="w-5 h-5" style={{ color: 'var(--color-text)' }} />
+              )}
+            </button>
           </div>
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => (
@@ -99,22 +123,21 @@ export default function Layout() {
                 key={item.name}
                 to={item.href}
                 end={item.href === '/'}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-primary-50 text-primary-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`
-                }
+                style={({ isActive }) => ({
+                  backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                  color: isActive ? '#ffffff' : 'var(--color-text)',
+                  fontWeight: isActive ? '500' : '400',
+                })}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:opacity-80"
               >
                 <item.icon className="w-5 h-5" />
                 {item.name}
               </NavLink>
             ))}
           </nav>
-          <div className="p-4 border-t">
+          <div className="p-4 border-t" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', opacity: 0.2 }}>
                 {user?.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -122,19 +145,20 @@ export default function Layout() {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <UserCircleIcon className="w-6 h-6 text-primary-600" />
+                  <UserCircleIcon className="w-6 h-6" style={{ color: 'var(--color-primary)' }} />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
                   {user?.displayName}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                <p className="text-xs truncate" style={{ color: 'var(--color-text)', opacity: 0.6 }}>{user?.email}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm rounded-lg transition-colors hover:opacity-80"
+              style={{ color: '#ef4444', backgroundColor: isDarkMode ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.1)' }}
             >
               <ArrowRightOnRectangleIcon className="w-5 h-5" />
               تسجيل الخروج
@@ -146,18 +170,31 @@ export default function Layout() {
       {/* Main content */}
       <div className="lg:pr-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 flex items-center h-16 px-4 bg-white border-b lg:px-8">
+        <header className="sticky top-0 z-30 flex items-center h-16 px-4 border-b lg:px-8" style={{ backgroundColor: 'var(--color-background)', borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+            className="p-2 rounded-lg hover:opacity-80 lg:hidden"
+            style={{ backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }}
           >
-            <Bars3Icon className="w-6 h-6" />
+            <Bars3Icon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />
           </button>
           <div className="flex-1" />
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg hover:opacity-80 lg:hidden"
+            style={{ backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }}
+            title={isDarkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
+          >
+            {isDarkMode ? (
+              <SunIcon className="w-5 h-5" style={{ color: 'var(--color-text)' }} />
+            ) : (
+              <MoonIcon className="w-5 h-5" style={{ color: 'var(--color-text)' }} />
+            )}
+          </button>
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-8">
+        <main className="p-4 lg:p-8" style={{ backgroundColor: isDarkMode ? 'var(--color-background)' : '#f9fafb', minHeight: 'calc(100vh - 4rem)' }}>
           <Outlet />
         </main>
       </div>

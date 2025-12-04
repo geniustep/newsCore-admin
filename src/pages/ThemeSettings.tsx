@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   PhotoIcon,
   PaintBrushIcon,
@@ -117,29 +118,16 @@ const fontOptions = [
 export default function ThemeSettings() {
   const [activeTab, setActiveTab] = useState<'logos' | 'colors' | 'typography' | 'advanced'>('logos');
   const [previewMode, setPreviewMode] = useState(false);
+  const { theme, updateTheme } = useTheme();
 
-  const { register, watch, setValue, handleSubmit } = useForm<ThemeSettings>({
-    defaultValues: {
-      logoAr: '',
-      logoEn: '',
-      logoFr: '',
-      favicon: '',
-      primaryColor: '#ed7520',
-      secondaryColor: '#0ea5e9',
-      accentColor: '#f59e0b',
-      backgroundColor: '#ffffff',
-      textColor: '#1f2937',
-      fontFamily: 'IBM Plex Sans Arabic',
-      fontSize: '16px',
-      headingFont: 'IBM Plex Sans Arabic',
-      borderRadius: '0.5rem',
-      spacing: 'normal',
-      darkModeEnabled: false,
-      darkPrimaryColor: '#f59e0b',
-      darkBackgroundColor: '#111827',
-      darkTextColor: '#f9fafb',
-    },
+  const { register, watch, setValue, handleSubmit, reset } = useForm<ThemeSettings>({
+    defaultValues: theme,
   });
+
+  // Update form when theme changes
+  useEffect(() => {
+    reset(theme);
+  }, [theme, reset]);
 
   const formData = watch();
 
@@ -181,7 +169,7 @@ export default function ThemeSettings() {
   };
 
   const onSubmit = (data: ThemeSettings) => {
-    console.log('Theme settings:', data);
+    updateTheme(data);
     toast.success('تم حفظ إعدادات القالب بنجاح');
   };
 
