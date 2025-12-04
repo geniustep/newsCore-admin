@@ -128,7 +128,8 @@ export default function ThemeSettings() {
     queryKey: ['themeSettings'],
     queryFn: async () => {
       const response = await settingsApi.getTheme();
-      return response as ThemeSettings;
+      // The interceptor returns the data directly, but TypeScript doesn't know that
+      return response as unknown as ThemeSettings;
     },
   });
 
