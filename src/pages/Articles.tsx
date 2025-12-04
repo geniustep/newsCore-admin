@@ -58,8 +58,10 @@ export default function Articles() {
     }
   };
 
-  const articles = (data as any)?.data?.data || [];
-  const meta = (data as any)?.data?.meta || { total: 0, totalPages: 1 };
+  // Backend returns { data: [...], meta: {...} }
+  // After axios interceptor (response.data), we get the same structure
+  const articles = (data as any)?.data || [];
+  const meta = (data as any)?.meta || { total: 0, totalPages: 1 };
 
   return (
     <div className="space-y-6">

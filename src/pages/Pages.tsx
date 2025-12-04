@@ -109,8 +109,9 @@ export default function Pages() {
     }
   };
 
-  const pages = (data as any)?.data?.data || [];
-  const meta = (data as any)?.data?.meta || { total: 0, totalPages: 1 };
+  // Backend returns { data: [...], meta: {...} }
+  const pages = (data as any)?.data || [];
+  const meta = (data as any)?.meta || { total: 0, totalPages: 1 };
 
   return (
     <div className="space-y-6">

@@ -39,7 +39,8 @@ api.interceptors.response.use(
           const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refreshToken,
           });
-          const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens;
+          // refreshTokens returns TokensDto directly: { accessToken, refreshToken, expiresIn }
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
           useAuthStore.getState().setTokens(accessToken, newRefreshToken);
           
           // Retry the original request

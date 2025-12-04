@@ -104,7 +104,8 @@ export default function Users() {
     }
   };
 
-  const users = (data as any)?.data?.data || [];
+  // Backend returns { data: [...], meta: {...} }
+  const users = (data as any)?.data || [];
   const saving = createMutation.isPending || updateMutation.isPending;
 
   return (

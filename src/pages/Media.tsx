@@ -81,7 +81,8 @@ export default function Media() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const media = (data as any)?.data?.data || [];
+  // Backend returns { data: [...], meta: {...} }
+  const media = (data as any)?.data || [];
 
   return (
     <div className="space-y-6">

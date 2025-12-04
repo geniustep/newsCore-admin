@@ -32,7 +32,7 @@ export default function Dashboard() {
   const stats = [
     {
       name: 'المقالات',
-      value: (articlesData as any)?.data?.meta?.total || 0,
+      value: (articlesData as any)?.meta?.total || 0,
       icon: DocumentTextIcon,
       color: 'bg-blue-500',
     },
@@ -93,8 +93,8 @@ export default function Dashboard() {
             </h2>
           </div>
           <div className="divide-y">
-            {(recentArticles as any)?.data?.data?.length > 0 ? (
-              (recentArticles as any).data.data.map((article: any) => (
+            {(recentArticles as any)?.data?.length > 0 ? (
+              (recentArticles as any).data.map((article: any) => (
                 <div key={article.id} className="p-4 hover:bg-gray-50">
                   <h3 className="font-medium text-gray-900 truncate">
                     {article.title}
