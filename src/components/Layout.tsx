@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/auth';
 import {
   HomeIcon,
   DocumentTextIcon,
+  DocumentDuplicateIcon,
   FolderIcon,
   TagIcon,
   PhotoIcon,
@@ -13,15 +14,17 @@ import {
   XMarkIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
+  ListBulletIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'لوحة التحكم', href: '/', icon: HomeIcon },
   { name: 'المقالات', href: '/articles', icon: DocumentTextIcon },
+  { name: 'الصفحات', href: '/pages', icon: DocumentDuplicateIcon },
   { name: 'التصنيفات', href: '/categories', icon: FolderIcon },
   { name: 'الوسوم', href: '/tags', icon: TagIcon },
   { name: 'الوسائط', href: '/media', icon: PhotoIcon },
-  { name: 'القوائم', href: '/menus', icon: Bars3Icon },
+  { name: 'القوائم', href: '/menus', icon: ListBulletIcon },
   { name: 'المستخدمين', href: '/users', icon: UsersIcon },
   { name: 'الإعدادات', href: '/settings', icon: Cog6ToothIcon },
 ];

@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Articles from './pages/Articles';
 import ArticleEditor from './pages/ArticleEditor';
+import Pages from './pages/Pages';
+import PageEditor from './pages/PageEditor';
 import Categories from './pages/Categories';
 import Tags from './pages/Tags';
 import Media from './pages/Media';
@@ -33,6 +35,9 @@ function App() {
         <Route path="articles" element={<Articles />} />
         <Route path="articles/new" element={<ArticleEditor />} />
         <Route path="articles/:id/edit" element={<ArticleEditor />} />
+        <Route path="pages" element={<Pages />} />
+        <Route path="pages/new" element={<PageEditor />} />
+        <Route path="pages/:id/edit" element={<PageEditor />} />
         <Route path="categories" element={<Categories />} />
         <Route path="tags" element={<Tags />} />
         <Route path="media" element={<Media />} />

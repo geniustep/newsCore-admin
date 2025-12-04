@@ -131,6 +131,32 @@ export const usersApi = {
   delete: (id: string) => api.delete(`/users/${id}`),
 };
 
+// Pages API
+export const pagesApi = {
+  getAll: (params?: any) => api.get('/pages', { params }),
+  getTree: (language?: string) => api.get('/pages/tree', { params: { language } }),
+  getHomepage: (language?: string) => api.get('/pages/homepage', { params: { language } }),
+  getOne: (id: string) => api.get(`/pages/${id}`),
+  getBySlug: (slug: string, language?: string) =>
+    api.get(`/pages/slug/${slug}`, { params: { language } }),
+  create: (data: any) => api.post('/pages', data),
+  update: (id: string, data: any) => api.patch(`/pages/${id}`, data),
+  delete: (id: string) => api.delete(`/pages/${id}`),
+  publish: (id: string) => api.post(`/pages/${id}/publish`),
+  archive: (id: string) => api.post(`/pages/${id}/archive`),
+  setAsHomepage: (id: string) => api.post(`/pages/${id}/set-homepage`),
+  reorder: (items: { id: string; sortOrder: number; parentId?: string | null }[]) =>
+    api.post('/pages/reorder', items),
+  // Translations
+  getTranslations: (pageId: string) => api.get(`/pages/${pageId}/translations`),
+  createTranslation: (pageId: string, data: any) =>
+    api.post(`/pages/${pageId}/translations`, data),
+  updateTranslation: (translationId: string, data: any) =>
+    api.patch(`/pages/translations/${translationId}`, data),
+  deleteTranslation: (translationId: string) =>
+    api.delete(`/pages/translations/${translationId}`),
+};
+
 // Menus API
 export const menusApi = {
   getAll: (params?: any) => api.get('/menus', { params }),
