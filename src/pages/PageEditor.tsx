@@ -63,7 +63,6 @@ export default function PageEditor() {
     control,
     reset,
     watch,
-    setValue,
     formState: { errors, isDirty },
   } = useForm<PageForm>({
     defaultValues: {
