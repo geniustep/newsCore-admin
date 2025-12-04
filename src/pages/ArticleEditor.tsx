@@ -1,15 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { articlesApi, categoriesApi, tagsApi } from '../lib/api';
 import {
   ArrowRightIcon,
   CloudArrowUpIcon,
+  EyeIcon,
+  CheckCircleIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
+import TipTapEditor from '../components/TipTapEditor';
+import ArticlePreviewModal from '../components/ArticlePreviewModal';
 
 interface ArticleForm {
   title: string;
@@ -33,6 +36,9 @@ export default function ArticleEditor() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEditing = Boolean(id);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle');
+  const autoSaveTimerRef = useRef<number>();
 
   const {
     register,
@@ -122,6 +128,51 @@ export default function ArticleEditor() {
     },
   });
 
+  const autoSaveMutation = useMutation({
+    mutationFn: (data: any) => articlesApi.update(id!, data),
+    onSuccess: () => {
+      setAutoSaveStatus('saved');
+      queryClient.invalidateQueries({ queryKey: ['article', id] });
+      setTimeout(() => setAutoSaveStatus('idle'), 2000);
+    },
+    onError: () => {
+      setAutoSaveStatus('idle');
+    },
+  });
+
+  const performAutoSave = useCallback((data: Partial<ArticleForm>) => {
+    if (!isEditing) return;
+
+    setAutoSaveStatus('saving');
+    const payload = {
+      ...data,
+      contentHtml: data.content,
+    };
+    autoSaveMutation.mutate(payload);
+  }, [isEditing, autoSaveMutation]);
+
+  // Auto-save on content change
+  useEffect(() => {
+    if (!isEditing) return;
+
+    const subscription = watch((value) => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      autoSaveTimerRef.current = setTimeout(() => {
+        performAutoSave(value as Partial<ArticleForm>);
+      }, 3000); // Auto-save after 3 seconds of inactivity
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [watch, performAutoSave, isEditing]);
+
   const onSubmit = (data: ArticleForm) => {
     const payload = {
       ...data,
@@ -137,6 +188,8 @@ export default function ArticleEditor() {
 
   const saving = createMutation.isPending || updateMutation.isPending;
 
+  const formData = watch();
+
   if (isEditing && articleLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -147,17 +200,54 @@ export default function ArticleEditor() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/articles')}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ArrowRightIcon className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {isEditing ? 'تعديل المقال' : 'مقال جديد'}
-          </h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/articles')}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowRightIcon className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {isEditing ? 'تعديل المقال' : 'مقال جديد'}
+            </h1>
+          </div>
+        </div>
+
+        {/* Auto-save indicator & Preview button */}
+        <div className="flex items-center gap-4">
+          {isEditing && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border">
+              {autoSaveStatus === 'saving' && (
+                <>
+                  <ClockIcon className="w-5 h-5 text-yellow-500 animate-pulse" />
+                  <span className="text-sm text-gray-600">جاري الحفظ...</span>
+                </>
+              )}
+              {autoSaveStatus === 'saved' && (
+                <>
+                  <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                  <span className="text-sm text-gray-600">تم الحفظ</span>
+                </>
+              )}
+              {autoSaveStatus === 'idle' && (
+                <>
+                  <CheckCircleIcon className="w-5 h-5 text-gray-400" />
+                  <span className="text-sm text-gray-500">محفوظ</span>
+                </>
+              )}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <EyeIcon className="w-5 h-5" />
+            معاينة
+          </button>
         </div>
       </div>
 
@@ -200,21 +290,9 @@ export default function ArticleEditor() {
                   control={control}
                   rules={{ required: 'المحتوى مطلوب' }}
                   render={({ field }) => (
-                    <ReactQuill
-                      theme="snow"
-                      value={field.value}
+                    <TipTapEditor
+                      content={field.value}
                       onChange={field.onChange}
-                      modules={{
-                        toolbar: [
-                          [{ header: [1, 2, 3, false] }],
-                          ['bold', 'italic', 'underline', 'strike'],
-                          [{ list: 'ordered' }, { list: 'bullet' }],
-                          [{ align: [] }],
-                          ['blockquote', 'code-block'],
-                          ['link', 'image', 'video'],
-                          ['clean'],
-                        ],
-                      }}
                       placeholder="اكتب محتوى المقال هنا..."
                     />
                   )}
@@ -428,6 +506,20 @@ export default function ArticleEditor() {
           </div>
         </div>
       </form>
+
+      {/* Preview Modal */}
+      <ArticlePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        article={{
+          title: formData.title || 'بدون عنوان',
+          subtitle: formData.subtitle,
+          content: formData.content || '<p>لا يوجد محتوى</p>',
+          coverImageUrl: formData.coverImageUrl,
+          author: (article as any)?.data?.author,
+          createdAt: (article as any)?.data?.createdAt,
+        }}
+      />
     </div>
   );
 }

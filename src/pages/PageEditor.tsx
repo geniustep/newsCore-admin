@@ -3,9 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { pagesApi } from '../lib/api';
+import TipTapEditor from '../components/TipTapEditor';
 import {
   ArrowRightIcon,
   CloudArrowUpIcon,
@@ -342,24 +341,9 @@ export default function PageEditor() {
                         control={control}
                         rules={{ required: 'المحتوى مطلوب' }}
                         render={({ field }) => (
-                          <ReactQuill
-                            theme="snow"
-                            value={field.value}
+                          <TipTapEditor
+                            content={field.value}
                             onChange={field.onChange}
-                            className="h-96"
-                            modules={{
-                              toolbar: [
-                                [{ header: [1, 2, 3, 4, false] }],
-                                ['bold', 'italic', 'underline', 'strike'],
-                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                [{ align: [] }],
-                                [{ direction: 'rtl' }],
-                                ['blockquote', 'code-block'],
-                                ['link', 'image', 'video'],
-                                [{ color: [] }, { background: [] }],
-                                ['clean'],
-                              ],
-                            }}
                             placeholder="اكتب محتوى الصفحة هنا..."
                           />
                         )}
@@ -369,7 +353,7 @@ export default function PageEditor() {
                       )}
                     </div>
 
-                    <div className="pt-12">
+                    <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         المقتطف
                       </label>

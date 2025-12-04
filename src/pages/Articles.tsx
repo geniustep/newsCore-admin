@@ -11,6 +11,7 @@ import {
   FunnelIcon,
 } from '@heroicons/react/24/outline';
 import { articlesApi } from '../lib/api';
+import ArticlePreviewModal from '../components/ArticlePreviewModal';
 
 const statusLabels: Record<string, { label: string; class: string }> = {
   DRAFT: { label: 'مسودة', class: 'badge-gray' },
@@ -26,6 +27,7 @@ export default function Articles() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+  const [previewArticle, setPreviewArticle] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -188,15 +190,24 @@ export default function Articles() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setPreviewArticle(article)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="معاينة"
+                          >
+                            <EyeIcon className="w-5 h-5" />
+                          </button>
                           <Link
                             to={`/articles/${article.id}/edit`}
                             className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                            title="تعديل"
                           >
                             <PencilIcon className="w-5 h-5" />
                           </Link>
                           <button
                             onClick={() => handleDelete(article.id, article.title)}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="حذف"
                           >
                             <TrashIcon className="w-5 h-5" />
                           </button>
@@ -238,6 +249,22 @@ export default function Articles() {
           </>
         )}
       </div>
+
+      {/* Preview Modal */}
+      {previewArticle && (
+        <ArticlePreviewModal
+          isOpen={!!previewArticle}
+          onClose={() => setPreviewArticle(null)}
+          article={{
+            title: previewArticle.title,
+            subtitle: previewArticle.subtitle,
+            content: previewArticle.content,
+            coverImageUrl: previewArticle.coverImageUrl,
+            author: previewArticle.author,
+            createdAt: previewArticle.createdAt,
+          }}
+        />
+      )}
     </div>
   );
 }
