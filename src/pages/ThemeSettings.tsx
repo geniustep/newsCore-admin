@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTheme } from '../contexts/ThemeContext';
+import { settingsApi } from '../lib/api';
 import {
   PhotoIcon,
   PaintBrushIcon,
@@ -119,10 +121,37 @@ export default function ThemeSettings() {
   const [activeTab, setActiveTab] = useState<'logos' | 'colors' | 'typography' | 'advanced'>('logos');
   const [previewMode, setPreviewMode] = useState(false);
   const { theme, updateTheme } = useTheme();
+  const queryClient = useQueryClient();
+
+  // Fetch theme settings from backend
+  const { data: backendTheme, isLoading } = useQuery({
+    queryKey: ['themeSettings'],
+    queryFn: () => settingsApi.getTheme(),
+  });
+
+  // Mutation to save theme settings to backend
+  const saveMutation = useMutation({
+    mutationFn: (data: ThemeSettings) => settingsApi.updateTheme(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['themeSettings'] });
+      toast.success('تم حفظ إعدادات القالب بنجاح');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'حدث خطأ أثناء الحفظ');
+    },
+  });
 
   const { register, watch, setValue, handleSubmit, reset } = useForm<ThemeSettings>({
     defaultValues: theme,
   });
+
+  // Update form when backend theme is loaded
+  useEffect(() => {
+    if (backendTheme) {
+      reset(backendTheme);
+      updateTheme(backendTheme);
+    }
+  }, [backendTheme, reset, updateTheme]);
 
   // Update form when theme changes
   useEffect(() => {
@@ -169,8 +198,10 @@ export default function ThemeSettings() {
   };
 
   const onSubmit = (data: ThemeSettings) => {
+    // Save to local state
     updateTheme(data);
-    toast.success('تم حفظ إعدادات القالب بنجاح');
+    // Save to backend
+    saveMutation.mutate(data);
   };
 
   const tabs = [

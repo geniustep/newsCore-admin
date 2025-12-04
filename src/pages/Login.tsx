@@ -24,7 +24,8 @@ export default function Login() {
     setLoading(true);
     try {
       const response: any = await authApi.login(data.email, data.password);
-      const { user, tokens } = response.data;
+      // After interceptor, response is already the data object
+      const { user, tokens } = response;
       login(user, tokens.accessToken, tokens.refreshToken);
       toast.success('تم تسجيل الدخول بنجاح');
       navigate('/');

@@ -191,3 +191,18 @@ export const menusApi = {
   getDynamicItems: (type: string, limit?: number) =>
     api.get(`/menus/dynamic/${type}`, { params: { limit } }),
 };
+
+// Settings API
+export const settingsApi = {
+  getAll: (isPublic?: boolean) => api.get('/settings', { params: { public: isPublic } }),
+  getByGroup: (group: string) => api.get(`/settings/group/${group}`),
+  getByKey: (key: string) => api.get(`/settings/${key}`),
+  create: (data: any) => api.post('/settings', data),
+  update: (key: string, data: any) => api.put(`/settings/${key}`, data),
+  delete: (key: string) => api.delete(`/settings/${key}`),
+  // Theme settings
+  getTheme: () => api.get('/settings/theme'),
+  updateTheme: (data: any) => api.put('/settings/theme', data),
+  // Site settings
+  getSite: () => api.get('/settings/public/site'),
+};
