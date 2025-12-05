@@ -18,6 +18,10 @@ import ThemeSettings from './pages/ThemeSettings';
 import BreakingNews from './pages/BreakingNews';
 import ScheduledPosts from './pages/ScheduledPosts';
 import Analytics from './pages/Analytics';
+// New Core System Pages
+import ThemeManager from './pages/ThemeManager';
+import ModuleManager from './pages/ModuleManager';
+import TranslationManager from './pages/TranslationManager';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -54,6 +58,10 @@ function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
         <Route path="theme" element={<ThemeSettings />} />
+        {/* Core System Routes */}
+        <Route path="themes" element={<ThemeManager />} />
+        <Route path="modules" element={<ModuleManager />} />
+        <Route path="translations" element={<TranslationManager />} />
       </Route>
     </Routes>
   );

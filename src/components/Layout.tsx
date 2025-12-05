@@ -22,6 +22,9 @@ import {
   ExclamationTriangleIcon,
   ClockIcon,
   ChartBarIcon,
+  PuzzlePieceIcon,
+  LanguageIcon,
+  SwatchIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -36,6 +39,10 @@ const navigation = [
   { name: 'التحليلات', href: '/analytics', icon: ChartBarIcon },
   { name: 'القوائم', href: '/menus', icon: ListBulletIcon },
   { name: 'المستخدمين', href: '/users', icon: UsersIcon },
+  // Core System
+  { name: 'القوالب', href: '/themes', icon: SwatchIcon },
+  { name: 'الوحدات', href: '/modules', icon: PuzzlePieceIcon },
+  { name: 'الترجمات', href: '/translations', icon: LanguageIcon },
   { name: 'إعدادات القالب', href: '/theme', icon: PaintBrushIcon },
   { name: 'الإعدادات', href: '/settings', icon: Cog6ToothIcon },
 ];
