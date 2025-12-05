@@ -43,7 +43,7 @@ export default function ArticleEditor() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle');
   const [sidebarVisible, setSidebarVisible] = useState(true);
   const [createdArticleId, setCreatedArticleId] = useState<string | null>(null);
-  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const autoSaveTimerRef = useRef<number | NodeJS.Timeout>();
 
   const {
     register,
@@ -193,9 +193,9 @@ export default function ArticleEditor() {
         clearTimeout(autoSaveTimerRef.current);
       }
 
-      autoSaveTimerRef.current = window.setTimeout(() => {
+      autoSaveTimerRef.current = setTimeout(() => {
         performAutoSave(value as Partial<ArticleForm>);
-      }, 3000); // Auto-save after 3 seconds of inactivity
+      }, 3000) as number; // Auto-save after 3 seconds of inactivity
     });
 
     return () => {
