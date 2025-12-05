@@ -11,7 +11,13 @@ interface AssignReviewerProps {
 export default function AssignReviewer({ currentReviewerId, onAssign }: AssignReviewerProps) {
   const [selectedUserId, setSelectedUserId] = useState<string>(currentReviewerId || '');
 
-  const { data: users } = useQuery({
+  interface User {
+    id: string;
+    displayName?: string;
+    email: string;
+  }
+
+  const { data: users } = useQuery<User[]>({
     queryKey: ['users', 'reviewers'],
     queryFn: () => usersApi.getAll({ role: 'editor' }),
   });
@@ -40,7 +46,7 @@ export default function AssignReviewer({ currentReviewerId, onAssign }: AssignRe
             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
           >
             <option value="">-- اختر مراجع --</option>
-            {users?.map((user: any) => (
+            {users?.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.displayName || user.email}
               </option>
@@ -50,7 +56,7 @@ export default function AssignReviewer({ currentReviewerId, onAssign }: AssignRe
 
         {currentReviewerId && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-            المراجع الحالي: {users?.find((u: any) => u.id === currentReviewerId)?.displayName || 'غير معين'}
+            المراجع الحالي: {users?.find((u) => u.id === currentReviewerId)?.displayName || 'غير معين'}
           </div>
         )}
 

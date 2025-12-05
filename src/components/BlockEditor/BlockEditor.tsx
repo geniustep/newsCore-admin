@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
-import { nanoid } from 'nanoid';
 import BlockRenderer from './BlockRenderer';
 import BlockToolbar from './BlockToolbar';
+
+// Simple ID generator (can be replaced with nanoid later)
+const generateId = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
 
 export interface Block {
   id: string;

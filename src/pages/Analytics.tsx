@@ -12,13 +12,29 @@ import {
   ArrowTrendingUpIcon,
 } from '@heroicons/react/24/outline';
 
+interface OverviewData {
+  pageViews?: number;
+  pageViewsChange?: number;
+  visitors?: number;
+  visitorsChange?: number;
+  avgTimeOnSite?: number;
+  avgTimeChange?: number;
+  bounceRate?: number;
+  bounceRateChange?: number;
+}
+
+interface PageviewData {
+  date: string;
+  value: number;
+}
+
 export default function Analytics() {
-  const { data: overview } = useQuery({
+  const { data: overview } = useQuery<OverviewData>({
     queryKey: ['analytics', 'overview'],
     queryFn: () => analyticsApi.getOverview({ period: '7days' }),
   });
 
-  const { data: pageviews } = useQuery({
+  const { data: pageviews } = useQuery<PageviewData[]>({
     queryKey: ['analytics', 'pageviews'],
     queryFn: () => analyticsApi.getPageviews({ period: '30days' }),
   });

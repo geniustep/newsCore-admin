@@ -8,11 +8,20 @@ import ReviewComments from '../components/Workflow/ReviewComments';
 import AssignReviewer from '../components/Workflow/AssignReviewer';
 import { ArticleStatus, WorkflowStep, ReviewComment } from '../types/workflow';
 
+interface Article {
+  id: string;
+  title: string;
+  status: string | ArticleStatus;
+  workflowSteps?: WorkflowStep[];
+  reviewComments?: ReviewComment[];
+  reviewerId?: string;
+}
+
 export default function ArticleWorkflow() {
   const { id } = useParams<{ id: string }>();
   const [selectedTab, setSelectedTab] = useState<'timeline' | 'comments' | 'assign'>('timeline');
 
-  const { data: article, isLoading } = useQuery({
+  const { data: article, isLoading } = useQuery<Article>({
     queryKey: ['article', id],
     queryFn: () => articlesApi.getOne(id!),
     enabled: !!id,
@@ -52,7 +61,7 @@ export default function ArticleWorkflow() {
           <h1 className="text-2xl font-bold text-gray-900">{article.title}</h1>
           <p className="text-gray-600 mt-1">إدارة سير العمل والمراجعة</p>
         </div>
-        <StatusBadge status={article.status as ArticleStatus} />
+        <StatusBadge status={String(article.status) as ArticleStatus} />
       </div>
 
       {/* Tabs */}

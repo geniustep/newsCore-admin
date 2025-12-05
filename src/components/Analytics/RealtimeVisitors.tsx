@@ -2,8 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { analyticsApi } from '../../lib/api';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
 
+interface RealtimeData {
+  count: number;
+}
+
 export default function RealtimeVisitors() {
-  const { data: visitors } = useQuery({
+  const { data: visitors } = useQuery<RealtimeData>({
     queryKey: ['analytics', 'realtime'],
     queryFn: analyticsApi.getRealtimeVisitors,
     refetchInterval: 5000, // تحديث كل 5 ثوان

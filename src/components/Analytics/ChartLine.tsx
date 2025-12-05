@@ -9,15 +9,7 @@ export default function ChartLine({ data }: ChartLineProps) {
     return Math.max(...data.map((d) => d.value), 1);
   }, [data]);
 
-  const points = useMemo(() => {
-    const width = 100;
-    const height = 200;
-    return data.map((d, index) => {
-      const x = (index / (data.length - 1 || 1)) * width;
-      const y = height - (d.value / maxValue) * height;
-      return `${x},${y}`;
-    }).join(' ');
-  }, [data, maxValue]);
+  // Removed unused points variable
 
   return (
     <div className="h-64 flex items-end justify-between gap-2">

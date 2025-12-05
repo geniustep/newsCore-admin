@@ -4,8 +4,14 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { ClockIcon } from '@heroicons/react/24/outline';
 
+interface ScheduledPost {
+  id: string;
+  title: string;
+  publishedAt?: string;
+}
+
 export default function ScheduledPosts() {
-  const { data: scheduledPosts, isLoading } = useQuery({
+  const { data: scheduledPosts, isLoading } = useQuery<ScheduledPost[]>({
     queryKey: ['articles', 'scheduled'],
     queryFn: () => articlesApi.getAll({ scheduled: true }),
   });
@@ -43,7 +49,7 @@ export default function ScheduledPosts() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {scheduledPosts.map((post: any) => (
+              {scheduledPosts.map((post) => (
                 <tr key={post.id}>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{post.title}</div>

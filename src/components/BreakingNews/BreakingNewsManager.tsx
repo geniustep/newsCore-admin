@@ -28,7 +28,7 @@ export default function BreakingNewsManager() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<BreakingNewsItem | undefined>();
 
-  const { data: news, isLoading } = useQuery({
+  const { data: news, isLoading } = useQuery<BreakingNewsItem[]>({
     queryKey: ['breaking-news', 'all'],
     queryFn: () => breakingNewsApi.getAll(),
   });
@@ -137,7 +137,7 @@ export default function BreakingNewsManager() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {news.map((item: BreakingNewsItem) => (
+              {news.map((item) => (
                 <tr key={item.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{item.title}</div>

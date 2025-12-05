@@ -2,8 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { analyticsApi } from '../../lib/api';
 import { EyeIcon } from '@heroicons/react/24/outline';
 
+interface TopArticle {
+  id: string;
+  title: string;
+  category: string;
+  views: number;
+}
+
 export default function TopArticles() {
-  const { data: topArticles, isLoading } = useQuery({
+  const { data: topArticles, isLoading } = useQuery<TopArticle[]>({
     queryKey: ['analytics', 'top-articles'],
     queryFn: () => analyticsApi.getTopArticles({ limit: 10 }),
   });
@@ -18,7 +25,7 @@ export default function TopArticles() {
 
   return (
     <div className="space-y-3">
-      {topArticles.map((article: any, index: number) => (
+      {topArticles.map((article, index) => (
         <div
           key={article.id}
           className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100"

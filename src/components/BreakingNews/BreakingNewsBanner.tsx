@@ -12,7 +12,7 @@ interface BreakingNewsItem {
 }
 
 export default function BreakingNewsBanner() {
-  const { data: news } = useQuery({
+  const { data: news } = useQuery<BreakingNewsItem[]>({
     queryKey: ['breaking-news'],
     queryFn: breakingNewsApi.getActive,
     refetchInterval: 30000, // تحديث كل 30 ثانية

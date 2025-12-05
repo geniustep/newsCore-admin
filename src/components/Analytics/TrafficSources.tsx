@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { analyticsApi } from '../../lib/api';
 
+interface TrafficSource {
+  name: string;
+  visits: number;
+}
+
 export default function TrafficSources() {
-  const { data: sources, isLoading } = useQuery({
+  const { data: sources, isLoading } = useQuery<TrafficSource[]>({
     queryKey: ['analytics', 'traffic-sources'],
     queryFn: () => analyticsApi.getTrafficSources({ period: '30days' }),
   });
@@ -15,11 +20,11 @@ export default function TrafficSources() {
     return <div className="text-center py-8 text-gray-500">لا توجد بيانات</div>;
   }
 
-  const total = sources.reduce((sum: number, s: any) => sum + s.visits, 0);
+  const total = sources.reduce((sum, s) => sum + s.visits, 0);
 
   return (
     <div className="space-y-4">
-      {sources.map((source: any) => {
+      {sources.map((source) => {
         const percentage = (source.visits / total) * 100;
         return (
           <div key={source.name}>
