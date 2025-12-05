@@ -298,7 +298,7 @@ export default function ArticleEditor() {
           {/* Article Link - Only show if article is published */}
           {isEditing && ((article as any)?.data?.slug || (article as any)?.slug) && ((article as any)?.data?.status || (article as any)?.status) === 'PUBLISHED' && (
             <a
-              href={`/articles/${(article as any)?.data?.slug || (article as any)?.slug}`}
+              href={`${import.meta.env.VITE_FRONTEND_URL || 'https://www.sahara2797.com'}/${(article as any)?.data?.language || (article as any)?.language || 'ar'}/article/${(article as any)?.data?.slug || (article as any)?.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
