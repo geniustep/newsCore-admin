@@ -458,10 +458,10 @@ export default function Menus() {
     );
   };
 
-  const menus = (menusData as any)?.data || [];
-  const menu = (menuData as any)?.data;
-  const categories = (categoriesData as any)?.data || [];
-  const tags = (tagsData as any)?.data || [];
+  const menus = (menusData as any)?.data || menusData || [];
+  const menu = (menuData as any)?.data || menuData;
+  const categories = (categoriesData as any)?.data || categoriesData || [];
+  const tags = (tagsData as any)?.data || tagsData || [];
 
   return (
     <div className="space-y-6">

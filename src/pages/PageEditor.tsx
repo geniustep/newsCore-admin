@@ -96,12 +96,13 @@ export default function PageEditor() {
 
   useEffect(() => {
     if (page) {
-      const data = (page as any).data;
+      // Handle both cases: page directly or page.data (for API response wrapper)
+      const data = (page as any).data || page;
       reset({
-        title: data.title,
+        title: data.title || '',
         content: data.content || '',
         excerpt: data.excerpt || '',
-        status: data.status,
+        status: data.status || 'DRAFT',
         language: data.language || 'ar',
         template: data.template || 'default',
         parentId: data.parent?.id || '',
@@ -184,7 +185,7 @@ export default function PageEditor() {
 
   const saving = createMutation.isPending || updateMutation.isPending;
   const currentStatus = watch('status');
-  const pageData = (page as any)?.data;
+  const pageData = (page as any)?.data || page;
 
   // Flatten pages tree for parent selection
   const flattenPages = (pages: any[], level = 0): { id: string; title: string; level: number }[] => {
@@ -200,7 +201,7 @@ export default function PageEditor() {
     return result;
   };
 
-  const parentOptions = flattenPages((pagesTree as any)?.data || []);
+  const parentOptions = flattenPages((pagesTree as any)?.data || pagesTree || []);
 
   if (isEditing && pageLoading) {
     return (

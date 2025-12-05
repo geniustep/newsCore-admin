@@ -91,23 +91,25 @@ export default function ArticleEditor() {
 
   // Reset form when article data is loaded or id changes
   useEffect(() => {
-    if (article && (article as any).data) {
-      const data = (article as any).data;
+    // Handle both cases: article directly or article.data (for API response wrapper)
+    const articleData = (article as any)?.data || article;
+    
+    if (articleData && isEditing) {
       reset({
-        title: data.title || '',
-        subtitle: data.subtitle || '',
-        excerpt: data.excerpt || '',
-        content: data.content || '',
-        status: data.status || 'DRAFT',
-        type: data.type || 'STANDARD',
-        coverImageUrl: data.coverImageUrl || '',
-        categoryIds: data.categories?.map((c: any) => c.id) || [],
-        tagIds: data.tags?.map((t: any) => t.id) || [],
-        isPinned: data.isPinned || false,
-        isFeatured: data.isFeatured || false,
-        isBreaking: data.isBreaking || false,
-        seoTitle: data.seo?.title || '',
-        seoDescription: data.seo?.description || '',
+        title: articleData.title || '',
+        subtitle: articleData.subtitle || '',
+        excerpt: articleData.excerpt || '',
+        content: articleData.content || '',
+        status: articleData.status || 'DRAFT',
+        type: articleData.type || 'STANDARD',
+        coverImageUrl: articleData.coverImageUrl || '',
+        categoryIds: articleData.categories?.map((c: any) => c.id) || [],
+        tagIds: articleData.tags?.map((t: any) => t.id) || [],
+        isPinned: articleData.isPinned || false,
+        isFeatured: articleData.isFeatured || false,
+        isBreaking: articleData.isBreaking || false,
+        seoTitle: articleData.seo?.title || '',
+        seoDescription: articleData.seo?.description || '',
       });
     } else if (!isEditing) {
       // Reset to empty form when creating new article
@@ -294,9 +296,9 @@ export default function ArticleEditor() {
           </div>
 
           {/* Article Link - Only show if article is published */}
-          {isEditing && (article as any)?.data?.slug && (article as any)?.data?.status === 'PUBLISHED' && (
+          {isEditing && ((article as any)?.data?.slug || (article as any)?.slug) && ((article as any)?.data?.status || (article as any)?.status) === 'PUBLISHED' && (
             <a
-              href={`/articles/${(article as any)?.data?.slug}`}
+              href={`/articles/${(article as any)?.data?.slug || (article as any)?.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -599,10 +601,10 @@ export default function ArticleEditor() {
           subtitle: formData.subtitle || undefined,
           content: formData.content || '<p>لا يوجد محتوى</p>',
           coverImageUrl: formData.coverImageUrl || undefined,
-          author: (article as any)?.data?.author ? {
-            displayName: (article as any).data.author.displayName || (article as any).data.author.name || 'مؤلف غير معروف'
+          author: ((article as any)?.data?.author || (article as any)?.author) ? {
+            displayName: ((article as any)?.data?.author || (article as any)?.author)?.displayName || ((article as any)?.data?.author || (article as any)?.author)?.name || 'مؤلف غير معروف'
           } : undefined,
-          createdAt: (article as any)?.data?.createdAt || undefined,
+          createdAt: (article as any)?.data?.createdAt || (article as any)?.createdAt || undefined,
         }}
       />
     </div>
