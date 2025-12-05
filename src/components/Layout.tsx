@@ -103,8 +103,8 @@ export default function Layout() {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:right-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-1 border-l" style={{ backgroundColor: 'var(--color-background)', borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
-          <div className="flex items-center justify-between h-16 px-6 border-b" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+        <div className="flex flex-col h-full border-l" style={{ backgroundColor: 'var(--color-background)', borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+          <div className="flex items-center justify-between h-16 px-6 border-b flex-shrink-0" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
             {currentLogo ? (
               <img src={currentLogo} alt="Logo" className="h-8 object-contain" />
             ) : (
@@ -123,7 +123,7 @@ export default function Layout() {
               )}
             </button>
           </div>
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto min-h-0">
             {navigation.map((item) => (
               <NavLink
                 key={item.name}
@@ -141,7 +141,7 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="p-4 border-t" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+          <div className="p-4 border-t flex-shrink-0" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)', opacity: 0.2 }}>
                 {user?.avatarUrl ? (

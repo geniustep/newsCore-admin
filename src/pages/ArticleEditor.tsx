@@ -71,10 +71,12 @@ export default function ArticleEditor() {
     },
   });
 
-  const { data: article, isLoading: articleLoading, refetch } = useQuery({
+  const { data: article, isLoading: articleLoading } = useQuery({
     queryKey: ['article', id],
     queryFn: () => articlesApi.getOne(id!),
-    enabled: isEditing,
+    enabled: isEditing && !!id,
+    refetchOnMount: true,
+    staleTime: 0,
   });
 
   const { data: categories } = useQuery({
@@ -87,13 +89,7 @@ export default function ArticleEditor() {
     queryFn: () => tagsApi.getAll(),
   });
 
-  useEffect(() => {
-    if (isEditing && id) {
-      // Refetch article data when component mounts or id changes
-      refetch();
-    }
-  }, [id, isEditing, refetch]);
-
+  // Reset form when article data is loaded or id changes
   useEffect(() => {
     if (article && (article as any).data) {
       const data = (article as any).data;
@@ -113,8 +109,26 @@ export default function ArticleEditor() {
         seoTitle: data.seo?.title || '',
         seoDescription: data.seo?.description || '',
       });
+    } else if (!isEditing) {
+      // Reset to empty form when creating new article
+      reset({
+        title: '',
+        subtitle: '',
+        excerpt: '',
+        content: '',
+        status: 'DRAFT',
+        type: 'STANDARD',
+        coverImageUrl: '',
+        categoryIds: [],
+        tagIds: [],
+        isPinned: false,
+        isFeatured: false,
+        isBreaking: false,
+        seoTitle: '',
+        seoDescription: '',
+      });
     }
-  }, [article, reset]);
+  }, [article, reset, isEditing, id]);
 
   const createMutation = useMutation({
     mutationFn: (data: any) => articlesApi.create(data),
