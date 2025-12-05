@@ -53,13 +53,17 @@ export default function ThemeManager() {
   const [customSettings, setCustomSettings] = useState<Record<string, any>>({});
 
   // Fetch themes
-  const { data: themes, isLoading } = useQuery<Theme[]>({
+  const { data: themes, isLoading, error } = useQuery<Theme[]>({
     queryKey: ['themes'],
     queryFn: async () => {
       const res = await api.get('/themes');
-      return res.data;
+      // api interceptor already extracts data, so res is the array directly
+      return Array.isArray(res) ? res : (res as any)?.data || res;
     },
   });
+
+  // Debug log
+  console.log('Themes data:', themes, 'Loading:', isLoading, 'Error:', error);
 
   // Activate theme mutation
   const activateMutation = useMutation({
