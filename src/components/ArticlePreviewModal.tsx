@@ -63,6 +63,9 @@ export default function ArticlePreviewModal({
                     <Dialog.Title className="text-xl font-bold text-gray-900">
                       معاينة المقال
                     </Dialog.Title>
+                    <Dialog.Description className="sr-only">
+                      معاينة المقال قبل النشر على مختلف الأجهزة
+                    </Dialog.Description>
 
                     {/* Device Toggle */}
                     <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
