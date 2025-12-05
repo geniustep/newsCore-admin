@@ -19,6 +19,9 @@ import {
   PaintBrushIcon,
   MoonIcon,
   SunIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -28,6 +31,9 @@ const navigation = [
   { name: 'التصنيفات', href: '/categories', icon: FolderIcon },
   { name: 'الوسوم', href: '/tags', icon: TagIcon },
   { name: 'الوسائط', href: '/media', icon: PhotoIcon },
+  { name: 'الأخبار العاجلة', href: '/breaking-news', icon: ExclamationTriangleIcon },
+  { name: 'المقالات المجدولة', href: '/scheduled-posts', icon: ClockIcon },
+  { name: 'التحليلات', href: '/analytics', icon: ChartBarIcon },
   { name: 'القوائم', href: '/menus', icon: ListBulletIcon },
   { name: 'المستخدمين', href: '/users', icon: UsersIcon },
   { name: 'إعدادات القالب', href: '/theme', icon: PaintBrushIcon },

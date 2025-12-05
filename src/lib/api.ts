@@ -206,3 +206,22 @@ export const settingsApi = {
   // Site settings
   getSite: () => api.get('/settings/public/site'),
 };
+
+// Breaking News API
+export const breakingNewsApi = {
+  getActive: () => api.get('/breaking-news/active'),
+  getAll: (params?: any) => api.get('/breaking-news', { params }),
+  create: (data: any) => api.post('/breaking-news', data),
+  update: (id: string, data: any) => api.patch(`/breaking-news/${id}`, data),
+  delete: (id: string) => api.delete(`/breaking-news/${id}`),
+  toggle: (id: string) => api.post(`/breaking-news/${id}/toggle`),
+};
+
+// Analytics API
+export const analyticsApi = {
+  getOverview: (params: any) => api.get('/analytics/overview', { params }),
+  getPageviews: (params: any) => api.get('/analytics/pageviews', { params }),
+  getTopArticles: (params: any) => api.get('/analytics/top-articles', { params }),
+  getTrafficSources: (params: any) => api.get('/analytics/traffic-sources', { params }),
+  getRealtimeVisitors: () => api.get('/analytics/realtime'),
+};

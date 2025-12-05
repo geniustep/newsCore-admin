@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Articles from './pages/Articles';
 import ArticleEditor from './pages/ArticleEditor';
+import ArticleWorkflow from './pages/ArticleWorkflow';
 import Pages from './pages/Pages';
 import PageEditor from './pages/PageEditor';
 import Categories from './pages/Categories';
@@ -14,6 +15,9 @@ import Users from './pages/Users';
 import Settings from './pages/Settings';
 import Menus from './pages/Menus';
 import ThemeSettings from './pages/ThemeSettings';
+import BreakingNews from './pages/BreakingNews';
+import ScheduledPosts from './pages/ScheduledPosts';
+import Analytics from './pages/Analytics';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -36,6 +40,7 @@ function App() {
         <Route path="articles" element={<Articles />} />
         <Route path="articles/new" element={<ArticleEditor />} />
         <Route path="articles/:id/edit" element={<ArticleEditor />} />
+        <Route path="articles/:id/workflow" element={<ArticleWorkflow />} />
         <Route path="pages" element={<Pages />} />
         <Route path="pages/new" element={<PageEditor />} />
         <Route path="pages/:id/edit" element={<PageEditor />} />
@@ -44,6 +49,9 @@ function App() {
         <Route path="media" element={<Media />} />
         <Route path="users" element={<Users />} />
         <Route path="menus" element={<Menus />} />
+        <Route path="breaking-news" element={<BreakingNews />} />
+        <Route path="scheduled-posts" element={<ScheduledPosts />} />
+        <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
         <Route path="theme" element={<ThemeSettings />} />
       </Route>
