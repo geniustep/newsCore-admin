@@ -110,7 +110,7 @@ export default function ArticlePreviewModal({
                   {article.coverImageUrl && (
                     <img
                       src={article.coverImageUrl}
-                      alt={article.title}
+                      alt={article.title || 'صورة المقال'}
                       className="w-full h-64 object-cover rounded-lg mb-6"
                     />
                   )}
@@ -120,7 +120,7 @@ export default function ArticlePreviewModal({
                     <h1 className={`font-bold text-gray-900 mb-2 ${
                       device === 'mobile' ? 'text-2xl' : 'text-4xl'
                     }`}>
-                      {article.title}
+                      {article.title || 'بدون عنوان'}
                     </h1>
 
                     {article.subtitle && (

@@ -341,7 +341,11 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        // Exclude link and underline from StarterKit since we're adding them separately with custom config
+        link: false,
+        underline: false,
+      }),
       Underline,
       TextStyle,
       Color,

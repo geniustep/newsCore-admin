@@ -88,21 +88,21 @@ export default function ArticleEditor() {
   });
 
   useEffect(() => {
-    if (article) {
+    if (article && (article as any).data) {
       const data = (article as any).data;
       reset({
-        title: data.title,
+        title: data.title || '',
         subtitle: data.subtitle || '',
         excerpt: data.excerpt || '',
-        content: data.content,
-        status: data.status,
-        type: data.type,
+        content: data.content || '',
+        status: data.status || 'DRAFT',
+        type: data.type || 'STANDARD',
         coverImageUrl: data.coverImageUrl || '',
         categoryIds: data.categories?.map((c: any) => c.id) || [],
         tagIds: data.tags?.map((t: any) => t.id) || [],
-        isPinned: data.isPinned,
-        isFeatured: data.isFeatured,
-        isBreaking: data.isBreaking,
+        isPinned: data.isPinned || false,
+        isFeatured: data.isFeatured || false,
+        isBreaking: data.isBreaking || false,
         seoTitle: data.seo?.title || '',
         seoDescription: data.seo?.description || '',
       });
@@ -575,11 +575,13 @@ export default function ArticleEditor() {
         onClose={() => setIsPreviewOpen(false)}
         article={{
           title: formData.title || 'بدون عنوان',
-          subtitle: formData.subtitle,
+          subtitle: formData.subtitle || undefined,
           content: formData.content || '<p>لا يوجد محتوى</p>',
-          coverImageUrl: formData.coverImageUrl,
-          author: (article as any)?.data?.author,
-          createdAt: (article as any)?.data?.createdAt,
+          coverImageUrl: formData.coverImageUrl || undefined,
+          author: (article as any)?.data?.author ? {
+            displayName: (article as any).data.author.displayName || (article as any).data.author.name || 'مؤلف غير معروف'
+          } : undefined,
+          createdAt: (article as any)?.data?.createdAt || undefined,
         }}
       />
     </div>
