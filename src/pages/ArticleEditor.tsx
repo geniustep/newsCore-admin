@@ -195,7 +195,7 @@ export default function ArticleEditor() {
 
       autoSaveTimerRef.current = setTimeout(() => {
         performAutoSave(value as Partial<ArticleForm>);
-      }, 3000) as number; // Auto-save after 3 seconds of inactivity
+      }, 3000); // Auto-save after 3 seconds of inactivity
     });
 
     return () => {
