@@ -13,7 +13,6 @@ import {
   ArrowUpTrayIcon,
   SparklesIcon,
   FolderIcon,
-  ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 import api from '../lib/api';
 
@@ -59,11 +58,17 @@ export default function TranslationManager() {
   const [showAddLanguage, setShowAddLanguage] = useState(false);
   const [showAddNamespace, setShowAddNamespace] = useState(false);
   const [showAddTranslation, setShowAddTranslation] = useState(false);
-  const [newLanguage, setNewLanguage] = useState({
+  const [newLanguage, setNewLanguage] = useState<{
+    code: string;
+    name: string;
+    nativeName: string;
+    direction: 'ltr' | 'rtl';
+    flag: string;
+  }>({
     code: '',
     name: '',
     nativeName: '',
-    direction: 'ltr' as const,
+    direction: 'ltr',
     flag: '',
   });
   const [newNamespace, setNewNamespace] = useState({ name: '', description: '' });
