@@ -23,7 +23,7 @@ export default function ArticleWorkflow() {
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: ['article', id],
-    queryFn: () => articlesApi.getOne(id!),
+    queryFn: async () => await articlesApi.getOne(id!) as Article,
     enabled: !!id,
   });
 

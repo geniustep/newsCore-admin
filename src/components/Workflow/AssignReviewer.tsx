@@ -19,7 +19,7 @@ export default function AssignReviewer({ currentReviewerId, onAssign }: AssignRe
 
   const { data: users } = useQuery<User[]>({
     queryKey: ['users', 'reviewers'],
-    queryFn: () => usersApi.getAll({ role: 'editor' }),
+    queryFn: async () => await usersApi.getAll({ role: 'editor' }) as User[],
   });
 
   const handleAssign = () => {

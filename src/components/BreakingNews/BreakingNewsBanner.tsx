@@ -14,7 +14,7 @@ interface BreakingNewsItem {
 export default function BreakingNewsBanner() {
   const { data: news } = useQuery<BreakingNewsItem[]>({
     queryKey: ['breaking-news'],
-    queryFn: breakingNewsApi.getActive,
+    queryFn: async () => await breakingNewsApi.getActive() as BreakingNewsItem[],
     refetchInterval: 30000, // تحديث كل 30 ثانية
   });
 

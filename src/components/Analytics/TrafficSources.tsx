@@ -9,7 +9,7 @@ interface TrafficSource {
 export default function TrafficSources() {
   const { data: sources, isLoading } = useQuery<TrafficSource[]>({
     queryKey: ['analytics', 'traffic-sources'],
-    queryFn: () => analyticsApi.getTrafficSources({ period: '30days' }),
+    queryFn: async () => await analyticsApi.getTrafficSources({ period: '30days' }) as TrafficSource[],
   });
 
   if (isLoading) {
