@@ -31,12 +31,12 @@ interface PageviewData {
 export default function Analytics() {
   const { data: overview } = useQuery<OverviewData>({
     queryKey: ['analytics', 'overview'],
-    queryFn: async () => await analyticsApi.getOverview({ period: '7days' }) as OverviewData,
+    queryFn: async () => await analyticsApi.getOverview({ period: '7days' }) as unknown as OverviewData,
   });
 
   const { data: pageviews } = useQuery<PageviewData[]>({
     queryKey: ['analytics', 'pageviews'],
-    queryFn: async () => await analyticsApi.getPageviews({ period: '30days' }) as PageviewData[],
+    queryFn: async () => await analyticsApi.getPageviews({ period: '30days' }) as unknown as PageviewData[],
   });
 
   return (

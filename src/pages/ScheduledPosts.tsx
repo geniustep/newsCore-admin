@@ -13,7 +13,7 @@ interface ScheduledPost {
 export default function ScheduledPosts() {
   const { data: scheduledPosts, isLoading } = useQuery<ScheduledPost[]>({
     queryKey: ['articles', 'scheduled'],
-    queryFn: async () => await articlesApi.getAll({ scheduled: true }) as ScheduledPost[],
+    queryFn: async () => await articlesApi.getAll({ scheduled: true }) as unknown as ScheduledPost[],
   });
 
   if (isLoading) {

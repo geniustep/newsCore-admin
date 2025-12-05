@@ -9,7 +9,7 @@ interface RealtimeData {
 export default function RealtimeVisitors() {
   const { data: visitors } = useQuery<RealtimeData>({
     queryKey: ['analytics', 'realtime'],
-    queryFn: async () => await analyticsApi.getRealtimeVisitors() as RealtimeData,
+    queryFn: async () => await analyticsApi.getRealtimeVisitors() as unknown as RealtimeData,
     refetchInterval: 5000, // تحديث كل 5 ثوان
   });
 

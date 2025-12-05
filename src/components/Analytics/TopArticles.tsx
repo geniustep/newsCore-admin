@@ -12,7 +12,7 @@ interface TopArticle {
 export default function TopArticles() {
   const { data: topArticles, isLoading } = useQuery<TopArticle[]>({
     queryKey: ['analytics', 'top-articles'],
-    queryFn: async () => await analyticsApi.getTopArticles({ limit: 10 }) as TopArticle[],
+    queryFn: async () => await analyticsApi.getTopArticles({ limit: 10 }) as unknown as TopArticle[],
   });
 
   if (isLoading) {

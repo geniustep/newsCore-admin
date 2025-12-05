@@ -30,7 +30,7 @@ export default function BreakingNewsManager() {
 
   const { data: news, isLoading } = useQuery<BreakingNewsItem[]>({
     queryKey: ['breaking-news', 'all'],
-    queryFn: async () => await breakingNewsApi.getAll() as BreakingNewsItem[],
+    queryFn: async () => await breakingNewsApi.getAll() as unknown as BreakingNewsItem[],
   });
 
   const queryClient = useQueryClient();
