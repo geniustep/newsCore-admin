@@ -71,7 +71,7 @@ export default function ArticleEditor() {
     },
   });
 
-  const { data: article, isLoading: articleLoading } = useQuery({
+  const { data: article, isLoading: articleLoading, refetch } = useQuery({
     queryKey: ['article', id],
     queryFn: () => articlesApi.getOne(id!),
     enabled: isEditing,
@@ -86,6 +86,13 @@ export default function ArticleEditor() {
     queryKey: ['tags'],
     queryFn: () => tagsApi.getAll(),
   });
+
+  useEffect(() => {
+    if (isEditing && id) {
+      // Refetch article data when component mounts or id changes
+      refetch();
+    }
+  }, [id, isEditing, refetch]);
 
   useEffect(() => {
     if (article && (article as any).data) {

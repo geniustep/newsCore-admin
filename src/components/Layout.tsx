@@ -63,12 +63,12 @@ export default function Layout() {
 
       {/* Mobile sidebar */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-72 shadow-xl transform transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-72 shadow-xl transform transition-transform duration-300 lg:hidden flex flex-col ${
           sidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ backgroundColor: 'var(--color-background)' }}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
+        <div className="flex items-center justify-between h-16 px-4 border-b flex-shrink-0" style={{ borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }}>
           {currentLogo ? (
             <img src={currentLogo} alt="Logo" className="h-8 object-contain" />
           ) : (
@@ -82,7 +82,7 @@ export default function Layout() {
             <XMarkIcon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />
           </button>
         </div>
-        <nav className="p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navigation.map((item) => (
             <NavLink
               key={item.name}
